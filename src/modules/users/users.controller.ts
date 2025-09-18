@@ -16,6 +16,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { Throttle } from '@nestjs/throttler';
 
 @UseInterceptors(CacheInterceptor)
 @CacheTTL(300)
@@ -23,6 +24,7 @@ import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Throttle({ default: { limit: 5, ttl: 60 } })
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')

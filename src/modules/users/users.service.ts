@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from './schemas/user.schema';
+import { User, UserRole } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -19,7 +19,7 @@ export class UsersService {
   }
 
   async findById(id: string): Promise<User | null> {
-    return this.userModel.findById(id).exec();
+    return this.userModel.findById(id).select('-password').exec();
   }
 
   async findAll(): Promise<User[]> {
@@ -42,5 +42,9 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
     return { message: `User with ID ${id} deleted successfully` };
+  }
+
+  async findAdmins(): Promise<User[]> {
+    return this.userModel.find({ role: UserRole.ADMIN }).exec();
   }
 }
