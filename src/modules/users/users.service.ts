@@ -23,12 +23,13 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
+    return this.userModel.find().select('-password').exec();
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const existingUser = await this.userModel
       .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .select('-password')
       .exec();
     if (!existingUser) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -45,6 +46,9 @@ export class UsersService {
   }
 
   async findAdmins(): Promise<User[]> {
-    return this.userModel.find({ role: UserRole.ADMIN }).exec();
+    return this.userModel
+      .find({ role: UserRole.ADMIN })
+      .select('-password')
+      .exec();
   }
 }
