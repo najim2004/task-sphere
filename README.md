@@ -1,98 +1,116 @@
+# Task Sphere - Collaborative Project Management Tool
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This is the backend for Task Sphere, a progressive and collaborative project management tool built with the [NestJS](https://github.com/nestjs/nest) framework.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+### 🚀 Live API
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+**Link:** [https://task-sphere-najim.railway.app](https://task-sphere-najim.railway.app)
 
-## Project setup
+**Note:** This project is deployed on a free-tier service (Railway). The service may spin down due to inactivity and the initial request might be slow. The free trial for this service will end after 30 days, after which the link may no longer be active.
 
-```bash
-$ npm install
-```
+---
 
-## Compile and run the project
+## 1. Project Setup
 
-```bash
-# development
-$ npm run start
+Follow these steps to get the project running on your local machine.
 
-# watch mode
-$ npm run start:dev
+### Prerequisites
 
-# production mode
-$ npm run start:prod
-```
+- [Node.js](https://nodejs.org/en/) (v18 or later recommended)
+- [npm](https://www.npmjs.com/)
+- [MongoDB](https://www.mongodb.com/try/download/community)
+- [Redis](https://redis.io/docs/getting-started/installation/)
 
-## Run tests
+### Installation
 
-```bash
-# unit tests
-$ npm run test
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/najim2004/task-sphere.git
+    cd task-sphere
+    ```
 
-# e2e tests
-$ npm run test:e2e
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-# test coverage
-$ npm run test:cov
-```
+3.  **Set up environment variables:**
+    - Create a `.env` file in the root directory by copying the example file:
+      ```bash
+      cp .env.example .env
+      ```
+    - Open the `.env` file and fill in the required values:
+      ```env
+      MONGO_URI=your_mongodb_connection_string
+      JWT_SECRET=your_strong_jwt_secret
+      REDIS_HOST=127.0.0.1
+      REDIS_PORT=6379
+      REDIS_PASSWORD=
+      ```
 
-## Deployment
+### Running the Application
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+-   **Development mode with watch:**
+    ```bash
+    npm run start:dev
+    ```
+-   **Production mode:**
+    ```bash
+    npm run build
+    npm run start:prod
+    ```
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 2. Architecture Overview
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+The application follows a modular architecture, leveraging the power of NestJS for separation of concerns and scalability.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+-   **Core Framework**: [NestJS](https://nestjs.com/)
+-   **Database**: [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/) for object data modeling (ODM).
+-   **Authentication**: JWT-based authentication using [Passport.js](https://www.passportjs.org/).
+-   **Real-time Communication**: [Socket.IO](https://socket.io/) for real-time features, particularly for the notification system.
+-   **Caching**: In-memory and [Redis](https://redis.io/) caching via NestJS's `CacheModule` to improve performance.
+-   **Background Jobs**: [Bull](https://github.com/OptimalBits/bull) with Redis for managing background jobs and queues.
 
-## Resources
+### Key Modules
 
-Check out a few resources that may come in handy when working with NestJS:
+-   `/src/modules/auth`: Handles user login and JWT strategy.
+-   `/src/modules/users`: Manages user creation and profiles.
+-   `/src/modules/projects`: Manages projects and team members.
+-   `/src/modules/tasks`: Manages tasks within projects.
+-   `/src/modules/notifications`: A complete real-time notification system.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Notification System Flow
 
-## Support
+1.  **Event Trigger**: An action in a service (e.g., `TasksService`) triggers a notification.
+2.  **Service Call**: The service calls `NotificationsService` with recipient and payload data.
+3.  **Persistence**: `NotificationsService` saves the notification to the MongoDB database.
+4.  **Real-time Push**: The service then calls `NotificationsGateway`.
+5.  **WebSocket Emission**: The gateway pushes the notification to the recipient's private room via Socket.IO, delivering it instantly to the client-side.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 3. Scalability Considerations
 
-## Stay in touch
+The architecture is designed with scalability in mind:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+1.  **Stateless Application Layer**: The NestJS application is stateless. You can run multiple instances of the application behind a load balancer to handle increased traffic.
 
-## License
+2.  **Database Scaling**: MongoDB can be scaled horizontally using **sharding** and made highly available using **replica sets**.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+3.  **WebSocket Scaling**: To scale the real-time layer across multiple instances, the default Socket.IO server needs a Redis adapter. This allows different server instances to broadcast events to all clients, regardless of which instance a client is connected to. You can implement this using NestJS's platform-socket.io adapters.
+
+4.  **Decoupled Job Queue**: By using Bull and Redis, background tasks (e.g., sending emails, processing data) are decoupled from the main application flow. The queue workers can be scaled independently as needed.
+
+## 4. Contact
+
+-   **Name**: [Najim]
+-   **Email**: [najim.developer@gmail.com]
+-   **GitHub**: [https://github.com/najim2004]
+-   **Portfolio**: [https://najim-dev.vercel.app]
+
+---
+*This README was generated and updated by Gemini.*
