@@ -1,34 +1,36 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
+import { CacheModule, CacheInterceptor } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-ioredis';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { BullModule } from '@nestjs/bull';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
-import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { ProjectsModule } from './modules/projects/projects.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
-import { ProjectsModule } from './modules/projects/projects.module';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import * as redisStore from 'cache-manager-ioredis';
-import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
-import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
-import { BullModule } from '@nestjs/bull';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { QueueModule } from './core/queue/queue.module';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 
 @Module({
   imports: [
+    // Config Module
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60,
-        limit: 10,
-      },
-    ]),
+
+    // Throttler Module
+    ThrottlerModule.forRoot([{ ttl: 60, limit: 10 }]),
+
+    // Mongoose
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -36,27 +38,34 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
       }),
       inject: [ConfigService],
     }),
+
+    // Global CacheModule with Redis
     CacheModule.registerAsync({
       isGlobal: true,
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         store: redisStore,
-        host: config.get<string>('REDIS_HOST'),
-        port: config.get<string>('REDIS_PORT'),
-        password: config.get<string>('REDIS_PASSWORD'),
+        host: config.get<string>('REDIS_HOST') || 'localhost',
+        port: config.get<number>('REDIS_PORT') || 6379,
+        password: config.get<string>('REDIS_PASSWORD') || undefined,
         ttl: 30,
       }),
     }),
+
+    // Bull Queue
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: (config: ConfigService) => ({
         redis: {
-          host: configService.get('REDIS_HOST'),
-          port: +configService.get('REDIS_PORT'),
+          host: config.get<string>('REDIS_HOST') || 'localhost',
+          port: +config.get('REDIS_PORT') || 6379,
+          password: config.get<string>('REDIS_PASSWORD') || undefined,
         },
       }),
       inject: [ConfigService],
     }),
+
+    // App Modules
     AuthModule,
     UsersModule,
     ProjectsModule,
@@ -68,18 +77,10 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CacheInterceptor,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_INTERCEPTOR, useClass: CacheInterceptor },
   ],
 })
 export class AppModule {}
