@@ -14,6 +14,8 @@ This is the backend for Task Sphere, a progressive and collaborative project man
 
 **Note:** This project is deployed on a free-tier service (Railway). The service may spin down due to inactivity and the initial request might be slow. The free trial for this service will end after 30 days, after which the link may no longer be active.
 
+**Video Drive Link:** [Google Drive](https://drive.google.com/file/d/1_YLPpceiGLhhWJZHrrqJ-1_sxoElCrlC/view?usp=sharing)
+
 ---
 
 ## 1. Project Setup
@@ -65,6 +67,19 @@ Follow these steps to get the project running on your local machine.
     npm run build
     npm run start:prod
     ```
+
+### Default Users
+-   **Admin User**
+    -   Email: `admin@example.com`
+    -   Password: `12345678`
+
+-   **Manager User**
+    -   Email: `manager@example.com`
+    -   Password: `12345678`
+
+-   **Member User**
+    -   Email: `member@example.com`
+    -   Password: `12345678`
 
 ## 2. Architecture Overview
 
