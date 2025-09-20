@@ -42,7 +42,7 @@ export class TasksController {
   @Roles(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER)
   @CacheTTL(300)
   findById(@Param('id') id: string, @Request() req: { user: UserPayload }) {
-    return this.tasksService.findById(id, req.user);
+    return this.tasksService.findOne(id, req.user);
   }
 
   @Get('project/:projectId')
@@ -52,7 +52,7 @@ export class TasksController {
     @Param('projectId') projectId: string,
     @Request() req: { user: UserPayload },
   ) {
-    return this.tasksService.findForProject(projectId, req.user);
+    return this.tasksService.findAll(projectId, req.user);
   }
 
   @Patch(':id')

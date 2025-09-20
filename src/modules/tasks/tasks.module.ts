@@ -6,6 +6,7 @@ import { Task, TaskSchema } from './schemas/task.schema';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { ProjectsModule } from '../projects/projects.module';
 import { AnalyticsModule } from '../analytics/analytics.module';
+import { Trie } from './trie';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { AnalyticsModule } from '../analytics/analytics.module';
     AnalyticsModule, // For logging events
   ],
   controllers: [TasksController],
-  providers: [TasksService],
+  providers: [TasksService, Trie],
 })
 export class TasksModule {}

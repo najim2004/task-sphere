@@ -1,56 +1,76 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { User } from 'src/modules/users/schemas/user.schema';
 
-export enum NotificationType {
-  TASK_ASSIGNED = 'task_assigned',
-  TASK_UPDATED = 'task_updated',
-  TASK_COMPLETED = 'task_completed',
-  PROJECT_ASSIGNED = 'project_assigned',
-  PROJECT_UPDATED = 'project_updated',
-  COMMENT_ADDED = 'comment_added',
-  DEADLINE_APPROACHING = 'deadline_approaching',
+export enum NotificationPriority {
+  HIGH = 'HIGH',
+  MEDIUM = 'MEDIUM',
+  LOW = 'LOW',
 }
 
-@Schema({ timestamps: true })
-export class Notification extends Document {
-  @Prop({ type: String, enum: NotificationType, required: true })
-  type: NotificationType;
+export enum NotificationEntityType {
+  TASK = 'task',
+  PROJECT = 'project',
+  COMMENT = 'comment',
+  USER = 'user',
+}
 
-  @Prop({ required: true })
+class RelatedEntity {
+  @Prop({
+    type: String,
+    enum: Object.values(NotificationEntityType),
+    required: true,
+  })
+  entity: NotificationEntityType;
+
+  @Prop({ type: Types.ObjectId, required: true })
+  entityId: Types.ObjectId;
+}
+
+@Schema({ timestamps: true, collection: 'notifications' })
+export class Notification extends Document {
+  @Prop({ type: String, required: true })
+  type: string;
+
+  @Prop({ type: String, required: true })
   title: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   message: string;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  recipient: User;
+  recipient: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
-  sender: User;
+  sender: Types.ObjectId;
 
-  @Prop({ type: String })
-  relatedEntity: string; // 'task', 'project', 'user'
+  @Prop({
+    type: String,
+    enum: Object.values(NotificationPriority),
+    default: NotificationPriority.MEDIUM,
+  })
+  priority: NotificationPriority;
 
-  @Prop({ type: Types.ObjectId })
-  relatedEntityId: Types.ObjectId;
-
-  @Prop({ default: false })
+  @Prop({ type: Boolean, default: false })
   isRead: boolean;
 
-  @Prop({ default: false })
+  @Prop({ type: Boolean, default: false })
   isDelivered: boolean;
 
   @Prop({ type: Date, default: Date.now })
   sentAt: Date;
 
-  @Prop({ type: Date })
+  @Prop({ type: Date, default: null })
   readAt: Date;
+
+  @Prop({ type: [RelatedEntity], default: [] })
+  relatedEntities: RelatedEntity[];
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);
 
-// Create indexes
 NotificationSchema.index({ recipient: 1, isRead: 1 });
-NotificationSchema.index({ createdAt: -1 });
-NotificationSchema.index({ type: 1 });
+NotificationSchema.index({ recipient: 1, createdAt: -1 });
+NotificationSchema.index(
+  { priority: 1 },
+  { partialFilterExpression: { priority: 'HIGH' } },
+);
