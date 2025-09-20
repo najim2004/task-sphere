@@ -10,7 +10,7 @@ This is the backend for Task Sphere, a progressive and collaborative project man
 
 ### 🚀 Live API
 
-**Link:** [https://task-sphere-najim.railway.app](https://task-sphere-najim.railway.app)
+**Link:** [https://task-sphere-najim.up.railway.app](https://task-sphere-najim.up.railway.app)
 
 **Note:** This project is deployed on a free-tier service (Railway). The service may spin down due to inactivity and the initial request might be slow. The free trial for this service will end after 30 days, after which the link may no longer be active.
 
